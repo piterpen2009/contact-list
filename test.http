@@ -1,14 +1,88 @@
-### Тестирование поиска даты рождения и профессии знакомых
-GET http://contact-list.ru/recipients/recipient?id_recipient=1
+### Тестирование поиска даты рождения и профессии знакомых по id
+GET http://contact-list.ru/recipient?id_recipient=1
 
 > {%
    client.test('Тестирование поиска даты рождения и профессии знакомых', function () {
    client.assert(response.status === 200, 'Проверяю код ответа. Фактическое знаение: ' + response.status);
    client.assert(response.contentType.mimeType === "application/json", 'Проверяю application/json. Фактическое знаение: ' + response.contentType.mimeType);
-   client.assert(response.body.hasOwnProperty('length') && response.body.length === 1, "В ответе есть один элемент");
    client.assert(response.body[0]['id_recipient'] === 1, "id получателя не корректен");
    client.assert(response.body[0]['full_name'] === "Осипов Геннадий Иванович", "полное имя не корректно");
    client.assert(response.body[0]['birthday'] === "15.06.1985", "день рождения не корректно");
    client.assert(response.body[0]['profession'] === "Системный администратор", "профессия не корректна");
+ });
+ %}
+
+### Тестирование поиска даты рождения и профессии знакомых по полному имени
+GET http://contact-list.ru/recipient?full_name=Осипов Геннадий Иванович
+
+> {%
+   client.test('Тестирование поиска даты рождения и профессии знакомых', function () {
+   client.assert(response.status === 200, 'Проверяю код ответа. Фактическое знаение: ' + response.status);
+   client.assert(response.contentType.mimeType === "application/json", 'Проверяю application/json. Фактическое знаение: ' + response.contentType.mimeType);
+   client.assert(response.body[0]['id_recipient'] === 1, "id получателя не корректен");
+   client.assert(response.body[0]['full_name'] === "Осипов Геннадий Иванович", "полное имя не корректно");
+   client.assert(response.body[0]['birthday'] === "15.06.1985", "день рождения не корректно");
+   client.assert(response.body[0]['profession'] === "Системный администратор", "профессия не корректна");
+ });
+ %}
+
+### Тестирование поиска времени беспокойства клиента по имени.
+GET http://contact-list.ru/customers?full_name=Калинин Пётр Александрович
+
+> {%
+   client.test('Тестирование поиска даты рождения и профессии знакомых', function () {
+   client.assert(response.status === 200, 'Проверяю код ответа. Фактическое знаение: ' + response.status);
+   client.assert(response.contentType.mimeType === "application/json", 'Проверяю application/json. Фактическое знаение: ' + response.contentType.mimeType);
+   client.assert(response.body[0]['id_recipient'] === 7, "id получателя не корректен");
+   client.assert(response.body[0]['full_name'] === "Калинин Пётр Александрович", "полное имя не корректно");
+   client.assert(response.body[0]['birthday'] === "04.06.1983", "день рождения не корректно");
+   client.assert(response.body[0]['contract_number'] === "5684", "номер не корректен");
+   client.assert(response.body[0]['average_transaction_amount'] === 2500, "средняя транзакция некорректна");
+   client.assert(response.body[0]['discount'] === "5%", "скидка не корректна");
+   client.assert(response.body[0]['time_to_call'] === "С 9:00 до 13:00 в будни", "время не корректно");
+ });
+ %}
+
+### Тестирование поиска контактов по категориям(клиенты)
+GET http://contact-list.ru/category?category=customers
+
+> {%
+   client.test('Тестирование поиска даты рождения и профессии знакомых', function () {
+   client.assert(response.status === 200, 'Проверяю код ответа. Фактическое знаение: ' + response.status);
+   client.assert(response.contentType.mimeType === "application/json", 'Проверяю application/json. Фактическое знаение: ' + response.contentType.mimeType);
+   client.assert(response.body.hasOwnProperty('length') && response.body.length === 3, "В ответе есть 3 элемента");
+ });
+ %}
+
+### Тестирование поиска контактов по категориям(получатели)
+GET http://contact-list.ru/category?category=recipients
+
+> {%
+   client.test('Тестирование поиска даты рождения и профессии знакомых', function () {
+   client.assert(response.status === 200, 'Проверяю код ответа. Фактическое знаение: ' + response.status);
+   client.assert(response.contentType.mimeType === "application/json", 'Проверяю application/json. Фактическое знаение: ' + response.contentType.mimeType);
+   client.assert(response.body.hasOwnProperty('length') && response.body.length === 5, "В ответе есть 5 элементов");
+ });
+ %}
+
+### Тестирование поиска контактов по категориям(коллеги)
+GET http://contact-list.ru/category?category=colleagues
+
+> {%
+   client.test('Тестирование поиска даты рождения и профессии знакомых', function () {
+   client.assert(response.status === 200, 'Проверяю код ответа. Фактическое знаение: ' + response.status);
+   client.assert(response.contentType.mimeType === "application/json", 'Проверяю application/json. Фактическое знаение: ' + response.contentType.mimeType);
+   client.assert(response.body.hasOwnProperty('length') && response.body.length === 2, "В ответе есть 2 элемента");
+ });
+ %}
+
+### Тестирование поиска контактов по категориям(родня)
+GET http://contact-list.ru/category?category=kinsfolk
+
+> {%
+   client.test('Тестирование поиска даты рождения и профессии знакомых', function () {
+   client.assert(response.status === 200, 'Проверяю код ответа. Фактическое знаение: ' + response.status);
+   client.assert(response.contentType.mimeType === "application/json", 'Проверяю application/json. Фактическое знаение: ' + response.contentType.mimeType);
+   client.assert(response.body.hasOwnProperty('length') && response.body.length === 5, "В ответе есть 5 элементов");
  });
  %}
