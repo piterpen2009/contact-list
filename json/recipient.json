@@ -1,0 +1,30 @@
+{
+	"id_recipient": 1,
+	"full_name": "Осипов Геннадий Иванович",
+	"birthday": "15.06.1985",
+	"profession": "Системный администратор"
+},
+{
+	"id_recipient": 2,
+	"full_name": "Тамара",
+	"birthday": "06.06.1990",
+	"profession": ""
+},
+{
+	"id_recipient": 3,
+	"full_name": "Дамир Авто",
+	"birthday": "01.12.1990",
+	"profession": "Автомеханик"
+},
+{
+	"id_recipient": 4,
+	"full_name": "Катя",
+	"birthday": "08.03.1989",
+	"profession": ""
+},
+{
+	"id_recipient": 5,
+	"full_name": "Шипенко Леонид Иосифович",
+	"birthday": "07.02.1969",
+	"profession": "Слесарь"
+},

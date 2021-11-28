@@ -1,0 +1,55 @@
+{
+	"id_entry": 1,
+	"id_recipient": 1,
+	"blacklist": false
+},
+{
+	"id_entry": 2,
+	"id_recipient": 2,
+	"blacklist": false
+},
+{
+	"id_entry": 3,
+	"id_recipient": 3,
+	"blacklist": false
+},
+{
+	"id_entry": 4,
+	"id_recipient": 4,
+	"blacklist": true
+},
+{
+	"id_entry": 5,
+	"id_recipient": 5,
+	"blacklist": false
+},
+{
+	"id_entry": 6,
+	"id_recipient": 6,
+	"blacklist": false
+},
+{
+	"id_entry": 7,
+	"id_recipient": 7,
+	"blacklist": false
+},
+{
+	"id_entry": 8,
+	"id_recipient": 8,
+	"blacklist": false
+},
+{
+	"id_entry": 9,
+	"id_recipient": 9,
+	"blacklist": false
+}
+{
+	"id_entry": 10,
+	"id_recipient": 10,
+	"blacklist": false
+}
+{
+	"id_entry": 11,
+	"id_recipient": 11,
+	"blacklist": false
+}

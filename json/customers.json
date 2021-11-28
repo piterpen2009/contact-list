@@ -1,0 +1,30 @@
+{
+	"id_recipient": 7,
+	"full_name": "Калинин Пётр Александрович",
+	"birthday": "04.06.1983",
+	"profession": "Фитнес тренер",
+	"contract_number": "5684",
+	"average_transaction_amount": 2500,
+	"discount": "5%",
+	"time_to_call": "С 9:00 до 13:00 в будни"
+},
+{
+	"id_recipient": 8,
+	"full_name": "Васин Роман Александрович",
+	"birthday": "04.01.1977",,
+	"profession": "Фитнес тренер",
+	"contract_number": "5683",
+	"average_transaction_amount": 9500,
+	"discount": "10%",
+	"time_to_call": "С 12:00 до 16:00 в будни"
+},
+{
+	"id_recipient": 9,
+	"full_name": "Стрелецкая Анастасия Виктоовна",
+	"birthday": "30.12.1980",,
+	"profession": "Админимстратор фитнес центра",
+	"contract_number": "5682",
+	"average_transaction_amount": 15200,
+	"discount": "10%",
+	"time_to_call": "С 17:00 до 19:00 в будни"
+}

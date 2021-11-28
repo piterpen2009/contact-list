@@ -1,0 +1,36 @@
+{
+	"id_phone_number": 1,
+	"id_recipient": 1,
+	"phone_number": "+79052321548",
+	"operator": "мтс"
+},
+{
+	"id_phone_number": 2,
+	"id_recipient": 2,
+	"phone_number": "+79052325119",
+	"operator": "мтс"
+},
+{
+	"id_phone_number": 3,
+	"id_recipient": 3,
+	"phone_number": "+79045218367",
+	"operator": "теле2"
+},
+{
+	"id_phone_number": 4,
+	"id_recipient": 4,
+	"phone_number": "+79805214963",
+	"operator": "Мегафон"
+},
+{
+	"id_phone_number": 5,
+	"id_recipient": 3,
+	"phone_number": "+79805218111",
+	"operator": "Мегафон"
+},
+{
+	"id_phone_number": 6,
+	"id_recipient": 5,
+	"phone_number": "+76005218551",
+	"operator": "Билайн"
+}
