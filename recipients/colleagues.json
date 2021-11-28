@@ -1,7 +1,8 @@
-{
+[
+	{
 	"id_recipient": 10,
 	"full_name": "Шатов Александр Иванович",
-	"birthday": "02.12.1971",,
+	"birthday": "02.12.1971",
 	"profession": "",
 	"department": "Дирекция",
 	"position": "Директор",
@@ -10,9 +11,10 @@
 {
 	"id_recipient": 11,
 	"full_name": "Наташа",
-	"birthday": "10.05.1984",,
+	"birthday": "10.05.1984",
 	"profession": "",
 	"department": "Дирекция",
 	"position": "Секретарь",
 	"room_number": "404"
-},
+}
+]

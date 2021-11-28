@@ -1,0 +1,14 @@
+### Тестирование поиска даты рождения и профессии знакомых
+GET http://contact-list.ru/recipients/recipient?id_recipient=1
+
+> {%
+   client.test('Тестирование поиска даты рождения и профессии знакомых', function () {
+   client.assert(response.status === 200, 'Проверяю код ответа. Фактическое знаение: ' + response.status);
+   client.assert(response.contentType.mimeType === "application/json", 'Проверяю application/json. Фактическое знаение: ' + response.contentType.mimeType);
+   client.assert(response.body.hasOwnProperty('length') && response.body.length === 1, "В ответе есть один элемент");
+   client.assert(response.body[0]['id_recipient'] === 1, "id получателя не корректен");
+   client.assert(response.body[0]['full_name'] === "Осипов Геннадий Иванович", "полное имя не корректно");
+   client.assert(response.body[0]['birthday'] === "15.06.1985", "день рождения не корректно");
+   client.assert(response.body[0]['profession'] === "Системный администратор", "профессия не корректна");
+ });
+ %}
