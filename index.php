@@ -15,9 +15,17 @@ $pathToColleagues = __DIR__ . '/rec/colleagues.json.json';
 $colleaguesTxt = file_get_contents($pathToColleagues);
 $colleagues = json_decode($colleaguesTxt,true);
 
-if('/recipient' === $_SERVER['PATH_INFO']) {
+$pathToLogFile = __DIR__.'/app.log';
+
+file_put_contents($pathToLogFile,'Url request received' . $_SERVER['REQUEST_URI'] . "\n", FILE_APPEND);
+
+$pathInfo = array_key_exists('PATH_INFO', $_SERVER) && $_SERVER['PATH_INFO'] ? $_SERVER['PATH_INFO'] : '';
+
+if('/recipient' === $pathInfo) {
     $httpCode = 200;
     $result = [];
+
+    file_put_contents($pathToLogFile,'dispatch "recipient" url' . "\n", FILE_APPEND);
 
     $recipientIDToInfo = [];
     foreach ($recipients as $recipientInfo) {
@@ -40,7 +48,9 @@ if('/recipient' === $_SERVER['PATH_INFO']) {
             $result[] = $recipientIDToInfo[$recipient['id_recipient']];
         }
     }
-} elseif ('/customers' === $_SERVER['PATH_INFO']) {
+    file_put_contents($pathToLogFile,'found recipients not category: '. count($result) . "\n", FILE_APPEND);
+} elseif ('/customers' === $pathInfo) {
+    file_put_contents($pathToLogFile,'dispatch "customers" url' . "\n", FILE_APPEND);
     $httpCode = 200;
     $result = [];
 
@@ -68,22 +78,40 @@ if('/recipient' === $_SERVER['PATH_INFO']) {
             $result[] = $customer;
         }
     }
+    file_put_contents($pathToLogFile,'found customers not category: '. count($result) . "\n", FILE_APPEND);
 
-} elseif ('/category' === $_SERVER['PATH_INFO']) {
+} elseif ('/category' === $pathInfo) {
     $httpCode = 200;
     $result = [];
     if (array_key_exists('category', $_GET)) {
         if ($_GET['category'] === 'customers') {
+            file_put_contents($pathToLogFile,'dispatch category "customers"' . "\n", FILE_APPEND);
             $result = $customers;
+            file_put_contents($pathToLogFile,'found customers: '. count($result) . "\n", FILE_APPEND);
         } elseif ($_GET['category'] === 'recipients') {
+            file_put_contents($pathToLogFile,'dispatch category "recipients"' . "\n", FILE_APPEND);
             $result = $recipients;
+            file_put_contents($pathToLogFile,'found recipients: '. count($result) . "\n", FILE_APPEND);
         } elseif ($_GET['category'] === 'kinsfolk') {
+            file_put_contents($pathToLogFile,'dispatch category "kinsfolk"' . "\n", FILE_APPEND);
             $result = $kinsfolk;
+            file_put_contents($pathToLogFile,'found kinsfolk: '. count($result) . "\n", FILE_APPEND);
         } elseif ($_GET['category'] === 'colleagues') {
+            file_put_contents($pathToLogFile,'dispatch category "colleagues"' . "\n", FILE_APPEND);
             $result = $colleagues;
+            file_put_contents($pathToLogFile,'found colleagues: '. count($result) . "\n", FILE_APPEND);
         }
     }
 
+} else {
+    file_put_contents($pathToLogFile, 'unsupported request' ."\n", FILE_APPEND);
+
+    $httpCode=404;
+    $result=[
+        'status'=>'fail',
+        'message'=>'unsupported request'
+    ];
+    file_put_contents($pathToLogFile,'error url' . "\n", FILE_APPEND);
 }
 header('Content-Type: application/json');
 http_response_code($httpCode);
