@@ -2,7 +2,7 @@
 GET http://contact-list.ru/recipient?id_recipient=1
 
 > {%
-   client.test('Тестирование поиска даты рождения и профессии знакомых', function () {
+   client.test('Тестирование поиска даты рождения и профессии знакомых по id', function () {
    client.assert(response.status === 200, 'Проверяю код ответа. Фактическое знаение: ' + response.status);
    client.assert(response.contentType.mimeType === "application/json", 'Проверяю application/json. Фактическое знаение: ' + response.contentType.mimeType);
    client.assert(response.body[0]['id_recipient'] === 1, "id получателя не корректен");
@@ -16,7 +16,7 @@ GET http://contact-list.ru/recipient?id_recipient=1
 GET http://contact-list.ru/recipient?full_name=Осипов Геннадий Иванович
 
 > {%
-   client.test('Тестирование поиска даты рождения и профессии знакомых', function () {
+   client.test('Тестирование поиска даты рождения и профессии знакомых по полному имени', function () {
    client.assert(response.status === 200, 'Проверяю код ответа. Фактическое знаение: ' + response.status);
    client.assert(response.contentType.mimeType === "application/json", 'Проверяю application/json. Фактическое знаение: ' + response.contentType.mimeType);
    client.assert(response.body[0]['id_recipient'] === 1, "id получателя не корректен");
@@ -30,7 +30,7 @@ GET http://contact-list.ru/recipient?full_name=Осипов Геннадий И�
 GET http://contact-list.ru/customers?full_name=Калинин Пётр Александрович
 
 > {%
-   client.test('Тестирование поиска даты рождения и профессии знакомых', function () {
+   client.test('Тестирование поиска времени беспокойства клиента по имени.', function () {
    client.assert(response.status === 200, 'Проверяю код ответа. Фактическое знаение: ' + response.status);
    client.assert(response.contentType.mimeType === "application/json", 'Проверяю application/json. Фактическое знаение: ' + response.contentType.mimeType);
    client.assert(response.body[0]['id_recipient'] === 7, "id получателя не корректен");
@@ -47,7 +47,7 @@ GET http://contact-list.ru/customers?full_name=Калинин Пётр Алек�
 GET http://contact-list.ru/category?category=customers
 
 > {%
-   client.test('Тестирование поиска даты рождения и профессии знакомых', function () {
+   client.test('Тестирование поиска контактов по категориям(клиенты)', function () {
    client.assert(response.status === 200, 'Проверяю код ответа. Фактическое знаение: ' + response.status);
    client.assert(response.contentType.mimeType === "application/json", 'Проверяю application/json. Фактическое знаение: ' + response.contentType.mimeType);
    client.assert(response.body.hasOwnProperty('length') && response.body.length === 3, "В ответе есть 3 элемента");
@@ -58,7 +58,7 @@ GET http://contact-list.ru/category?category=customers
 GET http://contact-list.ru/category?category=recipients
 
 > {%
-   client.test('Тестирование поиска даты рождения и профессии знакомых', function () {
+   client.test('Тестирование поиска контактов по категориям(получатели)', function () {
    client.assert(response.status === 200, 'Проверяю код ответа. Фактическое знаение: ' + response.status);
    client.assert(response.contentType.mimeType === "application/json", 'Проверяю application/json. Фактическое знаение: ' + response.contentType.mimeType);
    client.assert(response.body.hasOwnProperty('length') && response.body.length === 5, "В ответе есть 5 элементов");
@@ -69,7 +69,7 @@ GET http://contact-list.ru/category?category=recipients
 GET http://contact-list.ru/category?category=colleagues
 
 > {%
-   client.test('Тестирование поиска даты рождения и профессии знакомых', function () {
+   client.test('Тестирование поиска контактов по категориям(коллеги)', function () {
    client.assert(response.status === 200, 'Проверяю код ответа. Фактическое знаение: ' + response.status);
    client.assert(response.contentType.mimeType === "application/json", 'Проверяю application/json. Фактическое знаение: ' + response.contentType.mimeType);
    client.assert(response.body.hasOwnProperty('length') && response.body.length === 2, "В ответе есть 2 элемента");
@@ -80,22 +80,34 @@ GET http://contact-list.ru/category?category=colleagues
 GET http://contact-list.ru/category?category=kinsfolk
 
 > {%
-   client.test('Тестирование поиска даты рождения и профессии знакомых', function () {
+   client.test('Тестирование поиска контактов по категориям(родня)', function () {
    client.assert(response.status === 200, 'Проверяю код ответа. Фактическое знаение: ' + response.status);
    client.assert(response.contentType.mimeType === "application/json", 'Проверяю application/json. Фактическое знаение: ' + response.contentType.mimeType);
-   client.assert(response.body.hasOwnProperty('length') && response.body.length === 5, "В ответе есть 5 элементов");
+   client.assert(response.body.hasOwnProperty('length') && response.body.length === 1, "В ответе есть 1 элемент");
  });
  %}
 
-### Тестирование ситуации, когда передали некорректные данные по имени
+### Тестирование ситуации, когда передали некорректные данные по имени в поиске по клиентам
 GET http://contact-list.ru/customers?full_name[]=Калинин Пётр Александрович
 
 > {%
-     client.test("Тестирование ситуации, когда передали некорректное имя автора для поиска книги", function () {
+     client.test("Тестирование ситуации, когда передали некорректные данные по имени в поиске по клиентам", function () {
             client.assert(response.status === 500, 'Проверяю код ответа. Фактическое знаение: ' + response.status);
             client.assert(response.contentType.mimeType === "application/json", 'Проверяю application/json. Фактическое знаение: ' + response.contentType.mimeType);
             client.assert(response.body['status'] === "fail", "Некорректный статус");
-            client.assert(response.body['message'] === "inccorrect surname author", "Некорректное сообщение");
+            client.assert(response.body['message'] === "incorrect full_name", "Некорректное сообщение");
+     })
+ %}
+
+### Тестирование ситуации, когда передали некорректные данные по id в поиске по клиентам
+GET http://contact-list.ru/customers?id_recipient[]=1
+
+> {%
+     client.test("Тестирование ситуации, когда передали некорректные данные по id в поиске по клиентам", function () {
+            client.assert(response.status === 500, 'Проверяю код ответа. Фактическое знаение: ' + response.status);
+            client.assert(response.contentType.mimeType === "application/json", 'Проверяю application/json. Фактическое знаение: ' + response.contentType.mimeType);
+            client.assert(response.body['status'] === "fail", "Некорректный статус");
+            client.assert(response.body['message'] === "incorrect id_recipient", "Некорректное сообщение");
      })
  %}
 
@@ -104,7 +116,7 @@ GET http://contact-list.ru/customers?full_name[]=Калинин Пётр Але�
 GET http://contact-list.ru/?param=ru
 
 > {%
-     client.test("Неподдерживаемый запрос", function () {
+     client.test("Тестирование запроса без path", function () {
             client.assert(response.status === 404, 'Проверяю код ответа. Фактическое знаение: ' + response.status);
             client.assert(response.contentType.mimeType === "application/json", 'Проверяю application/json. Фактическое знаение: ' + response.contentType.mimeType);
             client.assert(response.body['status'] === "fail", "Некорректный статус");
@@ -117,7 +129,7 @@ GET http://contact-list.ru/?param=ru
 GET http://contact-list.ru/hhh?param=ru
 
 > {%
-     client.test("Неподдерживаемый запрос", function () {
+     client.test("Тестирование неподдерживаемого приложения url", function () {
             client.assert(response.status === 404, 'Проверяю код ответа. Фактическое знаение: ' + response.status);
             client.assert(response.contentType.mimeType === "application/json", 'Проверяю application/json. Фактическое знаение: ' + response.contentType.mimeType);
             client.assert(response.body['status'] === "fail", "Некорректный статус");
@@ -126,16 +138,40 @@ GET http://contact-list.ru/hhh?param=ru
  %}
 
 
-### Тестирование ситуации, когда передали некорректное id получателя
+### Тестирование ситуации, когда передали некорректное id получателя в поиске по знакомым
 GET http://contact-list.ru/recipient?id_recipient[]=1
 
 > {%
-     client.test("Тестирование ситуации, когда передали некорректное имя автора для поиска книги", function () {
+     client.test("Тестирование ситуации, когда передали некорректное id получателя в поиске по знакомым", function () {
             client.assert(response.status === 500, 'Проверяю код ответа. Фактическое знаение: ' + response.status);
             client.assert(response.contentType.mimeType === "application/json", 'Проверяю application/json. Фактическое знаение: ' + response.contentType.mimeType);
             client.assert(response.body['status'] === "fail", "Некорректный статус");
-            client.assert(response.body['message'] === "inccorrect title book", "Некорректное сообщение");
+            client.assert(response.body['message'] === "incorrect id_recipient", "Некорректное сообщение");
+     })
+ %}
+
+### Тестирование ситуации, когда передали некорректное full_name получателя в поиске по знакомым
+GET http://contact-list.ru/recipient?full_name[]=Осипов Геннадий Иванович
+
+> {%
+     client.test("Тестирование ситуации, когда передали некорректное full_name получателя в поиске по знакомым", function () {
+            client.assert(response.status === 500, 'Проверяю код ответа. Фактическое знаение: ' + response.status);
+            client.assert(response.contentType.mimeType === "application/json", 'Проверяю application/json. Фактическое знаение: ' + response.contentType.mimeType);
+            client.assert(response.body['status'] === "fail", "Некорректный статус");
+            client.assert(response.body['message'] === "incorrect full_name", "Некорректное сообщение");
      })
  %}
 
 
+
+### Тестирование ситуация, когда передали некорректные даанные по категории
+GET http://contact-list.ru/category?category=privet
+
+> {%
+     client.test("Тестирование ситуация, когда передали некорректные даанные по категории", function () {
+            client.assert(response.status === 500, 'Проверяю код ответа. Фактическое знаение: ' + response.status);
+            client.assert(response.contentType.mimeType === "application/json", 'Проверяю application/json. Фактическое знаение: ' + response.contentType.mimeType);
+            client.assert(response.body['status'] === "fail", "Некорректный статус");
+            client.assert(response.body['message'] === "dispatch category nothing", "Некорректное сообщение");
+     })
+ %}
