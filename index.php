@@ -4,27 +4,10 @@
  *
  * @param string $errMsg - сообщение о ошибке
  */
-function logger ( string $errMsg):void
+function loggerInFile ( string $errMsg):void
 {
     file_put_contents(__DIR__ . '/app.log',"{$errMsg}\n", FILE_APPEND);
 }
-/**
- *
- *
- * @param string $message - сообщение о причине ошибке
- * @param int $httpCode - http code
- * @param string $status - статус ошибки
- */
-function errorHandling(string $message, int $httpCode, string $status): void
-{
-    $result = [
-        'status' => $status,
-        'message' => $message
-    ];
-    logger($message);
-    render($result, $httpCode);
-}
-
 /**
  * Функция вывода данных
  *
@@ -42,15 +25,26 @@ function render(array $data, int $httpCode)
 /**
  * Функция валидации
  *
- * @param string $paramName - имя параметра
- * @param array $param - имя запроса
- * @param string $errorMessage - сообщение об ошибке
+ * @param array $validateParameters - валидируемые параметры, ключ имя параметра, а значение это текст сообщения о ошибке
+ * @param array $params - все множество параметров
+ * @return array - сообщение о ошибках
  */
-function paramTypeValidation(string $paramName, array $param, string $errorMessage)
+function paramTypeValidation(array $validateParameters, array $params):?array
 {
-    if (array_key_exists($paramName, $param) && false === is_string($param[$paramName])) {
-        errorHandling($errorMessage, 500, 'fail');
+    $result = null;
+    foreach ($validateParameters as $paramName => $errorMessage) {
+        if (array_key_exists($paramName, $params) && false === is_string($params[$paramName])) {
+            $result = [
+                'httpCode' => 500,
+                'result' => [
+                    'status' => 'fail',
+                    'message'=> $errorMessage
+                ]
+            ];
+            break;
+        }
     }
+    return $result;
 }
 
 /** Функция перводит данные из json формата в php и возвращает содержимое
@@ -67,151 +61,199 @@ function loadData (string $sourceName):array
 
 /**
  * Функция поиска знакомых по id или full_name
- * @return array - выводит результат поиска по знакомым
+ * @param $request array - параметры которые передаёт пользователь
+ * @param $logger callable - параметр инкапсулирующий логгирование
+ * @return array - возвращает результат поиска по знакомым
  */
-function findRecipient():array
+function findRecipient(array $request, callable $logger):array
 {
     $recipients = loadData('recipient');
-    $httpCode = 200;
-    $result = [];
-    logger('dispatch "recipient" url');
-    paramTypeValidation('id_recipient', $_GET, 'incorrect id_recipient');
-    paramTypeValidation('full_name', $_GET, 'incorrect full_name');
+    $logger('dispatch "recipient" url');
 
-    $recipientIDToInfo = [];
-    foreach ($recipients as $recipientInfo) {
-        $recipientIDToInfo[$recipientInfo['id_recipient']] = $recipientInfo;
-    }
-    foreach ($recipients as $recipient) {
-        if (array_key_exists('id_recipient', $_GET)) {
-            $recipientMeetSearchCriteria = $_GET['id_recipient'] == (string)$recipientIDToInfo[$recipient['id_recipient']]['id_recipient'];
-        } elseif (array_key_exists('full_name', $_GET)) {
-            $recipientMeetSearchCriteria = $_GET['full_name'] === $recipientIDToInfo[$recipient['id_recipient']]['full_name'];
-        } elseif (array_key_exists('birthday', $_GET)) {
-            $recipientMeetSearchCriteria = $_GET['birthday'] === $recipientIDToInfo[$recipient['id_recipient']]['birthday'];
-        } elseif (array_key_exists('profession', $_GET)) {
-            $recipientMeetSearchCriteria = $_GET['profession'] === $recipientIDToInfo[$recipient['id_recipient']]['profession'];
-        } else {
-            $recipientMeetSearchCriteria = true;
-        }
-        if ($recipientMeetSearchCriteria) {
-            $result[] = $recipientIDToInfo[$recipient['id_recipient']];
-        }
-    }
-    logger('found recipients not category: '. count($result));
-    return [
-        'httpCode' => $httpCode,
-        'result' => $result
+    $paramValidations = [
+        'id_recipient' => 'incorrect id_recipient',
+        'full_name' =>'incorrect full_name',
+        'birthday' => 'incorrect birthday',
+        'profession' => 'incorrect profession'
     ];
 
+    if(null === ($result = paramTypeValidation($paramValidations, $request))) {
+        $foundRecipients = [];
+        $recipientIDToInfo = [];
+        foreach ($recipients as $recipientInfo) {
+            $recipientIDToInfo[$recipientInfo['id_recipient']] = $recipientInfo;
+        }
+        foreach ($recipients as $recipient) {
+            if (array_key_exists('id_recipient', $request)) {
+                $recipientMeetSearchCriteria = $request['id_recipient'] == (string)$recipientIDToInfo[$recipient['id_recipient']]['id_recipient'];
+            } elseif (array_key_exists('full_name', $request)) {
+                $recipientMeetSearchCriteria = $request['full_name'] === $recipientIDToInfo[$recipient['id_recipient']]['full_name'];
+            } elseif (array_key_exists('birthday', $request)) {
+                $recipientMeetSearchCriteria = $request['birthday'] === $recipientIDToInfo[$recipient['id_recipient']]['birthday'];
+            } elseif (array_key_exists('profession', $request)) {
+                $recipientMeetSearchCriteria = $request['profession'] === $recipientIDToInfo[$recipient['id_recipient']]['profession'];
+            } else {
+                $recipientMeetSearchCriteria = true;
+            }
+            if ($recipientMeetSearchCriteria) {
+                $foundRecipients[] = $recipientIDToInfo[$recipient['id_recipient']];
+            }
+        }
+        $logger('found recipients not category: ' . count($foundRecipients));
+        return [
+            'httpCode' => 200,
+            'result' => $foundRecipients
+        ];
+    }
+    return $result;
 }
 
 /**
  * Функция поиска клиента по id или full_name
- * @return array - выводит результат поиска по клиентам
+ * @param $request array - параметры которые передаёт пользователь
+ * @param $logger callable - параметр инкапсулирующий логгирование
+ * @return array - возвращает результат поиска по авторам
  */
-function findCustomers():array
+
+function findCustomers(array $request, callable $logger):array
 {
     $customers = loadData('customers');
-    logger('dispatch "customers" url');
-    $httpCode = 200;
-    $result = [];
-
-    paramTypeValidation('id_recipient', $_GET, 'incorrect id_recipient');
-    paramTypeValidation('full_name', $_GET, 'incorrect full_name');
-
-    foreach ($customers as $customer) {
-        if (array_key_exists('id_recipient', $_GET)) {
-            $customerMeetSearchCriteria = $_GET['id_recipient'] === (string)$customer['id_recipient'];
-        } elseif (array_key_exists('full_name', $_GET)) {
-            $customerMeetSearchCriteria = $_GET['full_name'] === $customer['full_name'];
-        } elseif (array_key_exists('birthday', $_GET)) {
-            $customerMeetSearchCriteria = $_GET['birthday'] === $customer['birthday'];
-        } elseif (array_key_exists('profession', $_GET)) {
-            $customerMeetSearchCriteria = $_GET['profession'] === $customer['profession'];
-        } elseif (array_key_exists('contract_number', $_GET)) {
-            $customerMeetSearchCriteria = $_GET['contract_number'] === $customer['contract_number'];
-        } elseif (array_key_exists('average_transaction_amount', $_GET)) {
-            $customerMeetSearchCriteria = $_GET['average_transaction_amount'] === (string)$customer['average_transaction_amount'];
-        } elseif (array_key_exists('discount', $_GET)) {
-            $customerMeetSearchCriteria = $_GET['discount'] === $customer['discount'];
-        } elseif (array_key_exists('time_to_call', $_GET)) {
-            $customerMeetSearchCriteria = $_GET['time_to_call'] === $customer['time_to_call'];
-        } else {
-            $customerMeetSearchCriteria = true;
-        }
-        if ($customerMeetSearchCriteria) {
-            $result[] = $customer;
-        }
-    }
-    logger('found customers not category: '. count($result) );
-    return [
-        'httpCode' => $httpCode,
-        'result' => $result
+    $logger('dispatch "customers" url');
+    $paramValidations = [
+        'id_recipient' => 'incorrect id_recipient',
+        'full_name' =>'incorrect full_name',
+        'birthday' => 'incorrect birthday',
+        'profession' => 'incorrect profession',
+        'contract_number' => ' incorrect contract_number',
+        'average_transaction_amount' => 'incorrect average_transaction_amount',
+        'discount' => 'incorrect discount',
+        'time_to_call' => 'incorrect time_to_call'
     ];
+
+    if(null === ($result = paramTypeValidation($paramValidations, $request))) {
+        $foundCustomers =[];
+        foreach ($customers as $customer) {
+            if (array_key_exists('id_recipient', $request)) {
+                $customerMeetSearchCriteria = $request['id_recipient'] === (string)$customer['id_recipient'];
+            } elseif (array_key_exists('full_name', $request)) {
+                $customerMeetSearchCriteria = $request['full_name'] === $customer['full_name'];
+            } elseif (array_key_exists('birthday', $request)) {
+                $customerMeetSearchCriteria = $request['birthday'] === $customer['birthday'];
+            } elseif (array_key_exists('profession', $request)) {
+                $customerMeetSearchCriteria = $request['profession'] === $customer['profession'];
+            } elseif (array_key_exists('contract_number', $request)) {
+                $customerMeetSearchCriteria = $request['contract_number'] === $customer['contract_number'];
+            } elseif (array_key_exists('average_transaction_amount', $request)) {
+                $customerMeetSearchCriteria = $request['average_transaction_amount'] === (string)$customer['average_transaction_amount'];
+            } elseif (array_key_exists('discount', $request)) {
+                $customerMeetSearchCriteria = $request['discount'] === $customer['discount'];
+            } elseif (array_key_exists('time_to_call', $request)) {
+                $customerMeetSearchCriteria = $request['time_to_call'] === $customer['time_to_call'];
+            } else {
+                $customerMeetSearchCriteria = true;
+            }
+            if ($customerMeetSearchCriteria) {
+                $foundCustomers = $customer;
+            }
+        }
+        $logger('found customers not category: ' . count($foundCustomers));
+        return [
+            'httpCode' => 200,
+            'result' => $foundCustomers
+        ];
+    }
+    return $result;
 }
 
 /**
  * Функция поиска контакттов по категории
- * @return array - результат поиска по категориям
+ * @param $request array - параметры которые передаёт пользователь
+ * @param $logger callable - параметр инкапсулирующий логгирование
+ * @return array - возвращает результат поиска по категориям
  */
-function findContactOnCategory():array
+function findContactOnCategory(array $request, callable $logger):array
 {
     $customers = loadData('customers');
     $recipients = loadData('recipient');
     $kinsfolk = loadData('kinsfolk');
     $colleagues = loadData('colleagues');
-    $httpCode = 200;
-    $result = [];
-    $categoryList = ['customers','kinsfolk','colleagues','recipients'];
-    logger('dispatch "category" url');
-    if (array_key_exists('category', $_GET)) {
-        if ($_GET['category'] === 'customers') {
-            logger('dispatch category "customers"');
-            $result = $customers;
-            logger('found customers: '. count($result));
-        } elseif ($_GET['category'] === 'recipients') {
-            logger('dispatch category "recipients"');
-            $result = $recipients;
-            logger('found customers: '. count($result));
-        } elseif ($_GET['category'] === 'kinsfolk') {
-            logger('dispatch category "kinsfolk"');
-            $result = $kinsfolk;
-            logger('found kinsfolk: '. count($result));
-        } elseif ($_GET['category'] === 'colleagues') {
-            logger('dispatch category "colleagues"');
-            $result = $colleagues;
-            logger('found colleagues: '. count($result));
-        } else {
-            errorHandling('dispatch category nothing', 500,'fail');
-        }
+
+    $logger('dispatch "category" url');
+
+    if (!array_key_exists('category', $request)) {
+        return [
+            'httpCode' => 500,
+            'result' => [
+                'status' => 'fail',
+                'message' => 'empty category'
+            ]
+        ];
     }
-    return [
-        'httpCode' => $httpCode,
-        'result' => $result
-    ];
+        if ($request['category'] === 'customers') {
+            $logger('dispatch category "customers"');
+            $foundRecipientsOnCategory = $customers;
+            $logger('found customers: '. count($foundRecipientsOnCategory));
+        } elseif ($request['category'] === 'recipients') {
+            $logger('dispatch category "recipients"');
+            $foundRecipientsOnCategory = $recipients;
+            $logger('found customers: '. count($foundRecipientsOnCategory));
+        } elseif ($request['category'] === 'kinsfolk') {
+            $logger('dispatch category "kinsfolk"');
+            $foundRecipientsOnCategory = $kinsfolk;
+            $logger('found kinsfolk: '. count($foundRecipientsOnCategory));
+        } elseif ($request['category'] === 'colleagues') {
+            $logger('dispatch category "colleagues"');
+            $foundRecipientsOnCategory = $colleagues;
+            $logger('found colleagues: '. count($foundRecipientsOnCategory));
+        } else {
+            return [
+                'httpCode' => 500,
+                'result' => [
+                    'status' => 'fail',
+                    'message' => 'dispatch category nothing'
+                ]
+            ];
+        }
+        return [
+            'httpCode' => 200,
+            'result' => $foundRecipientsOnCategory
+        ];
 }
 
 /** Функция реализации веб приложения
  *
+ * @param $requestUri string - URI запроса
+ * @param $request array - параметры которые передаёт пользователь
+ * @param $logger callable - параметр инкапсулирующий логгирование
  * @return array
  */
-
-function app ():array
+function app (string $requestUri, array $request, callable $logger):array
 {
-    logger('Url request received' . $_SERVER['REQUEST_URI']);
-    $pathInfo = array_key_exists('PATH_INFO', $_SERVER) && $_SERVER['PATH_INFO'] ? $_SERVER['PATH_INFO'] : '';
+    $logger('Url request received' . $requestUri);
+    $urlPath = parse_url($requestUri, PHP_URL_PATH);
 
-    if('/recipient' === $pathInfo) {
-        $result = findRecipient();
-    } elseif ('/customers' === $pathInfo) {
-        $result = findCustomers();
-    } elseif ('/category' === $pathInfo) {
-        $result = findContactOnCategory();
+    if('/recipient' === $urlPath) {
+        $result = findRecipient($request, $logger);
+    } elseif ('/customers' === $urlPath) {
+        $result = findCustomers($request, $logger);
+    } elseif ('/category' === $urlPath) {
+        $result = findContactOnCategory($request, $logger);
     } else {
-        errorHandling('unsupported request', 404,'fail');
+        $result = [
+            'httpCode' => 404,
+            'result' => [
+                'status' => 'fail',
+                'message' => 'unsupported request'
+            ]
+        ];
+        $logger($result['result']['message']);
     }
     return $result;
 }
-$resultApp = app();
+$resultApp = app
+(
+    $_SERVER['REQUEST_URI'],
+    $_GET,
+    'loggerInFile'
+);
 render($resultApp['result'], $resultApp['httpCode']);
